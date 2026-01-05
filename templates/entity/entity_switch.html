@@ -1,0 +1,12 @@
+<div class="entity-card switch {% if entity.state == 'on' %}active{% endif %}">
+    <div class="entity-icon">{% if entity.state == 'on' %}🔘{% else %}⚪{% endif %}</div>
+    <div class="entity-info">
+        <div class="entity-name">{{ entity.name }}</div>
+        <div class="entity-state">{{ entity.state }}</div>
+    </div>
+    <form method="GET" action="/toggle/{{ dashboard_path }}/{{ entity.id }}" style="margin: 0;">
+        <button type="submit" class="toggle-btn">
+            {% if entity.state == 'on' %}WYŁ{% else %}WŁ{% endif %}
+        </button>
+    </form>
+</div>

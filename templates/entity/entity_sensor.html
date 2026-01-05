@@ -1,0 +1,12 @@
+<div class="entity-card sensor">
+    <div class="entity-icon">📊</div>
+    <div class="entity-info">
+        <div class="entity-name">{{ entity.name }}</div>
+        <div class="entity-state">
+            {{ entity.state }}
+            {% if entity.attributes.unit_of_measurement %}
+            {{ entity.attributes.unit_of_measurement }}
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Assistant - Dashboardy</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-tabs">
+                <a href="/?view=rooms" class="header-tab {% if current_view == 'rooms' %}active{% endif %}">Pokoje</a>
+                <a href="/?view=dashboards" class="header-tab {% if current_view == 'dashboards' %}active{% endif %}">Dashboardy</a>
+            </div>
+        </header>
+
+        <div class="dashboard-list">
+            {% for dashboard in dashboards %}
+            <a href="/dashboard/{{ dashboard.path }}" class="dashboard-link">
+                <div class="dashboard-card">
+                    <div class="dashboard-title">{{ dashboard.title }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

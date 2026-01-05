@@ -1,0 +1,13 @@
+<div class="entity-card climate">
+    <div class="entity-icon">🌡️</div>
+    <div class="entity-info">
+        <div class="entity-name">{{ entity.name }}</div>
+        <div class="entity-state">{{ entity.state }}</div>
+        {% if entity.attributes.current_temperature %}
+        <div class="entity-detail">Temp: {{ entity.attributes.current_temperature }}°C</div>
+        {% endif %}
+        {% if entity.attributes.temperature %}
+        <div class="entity-detail">Docelowa: {{ entity.attributes.temperature }}°C</div>
+        {% endif %}
+    </div>
+</div>
