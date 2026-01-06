@@ -27,23 +27,6 @@ header {
     align-items: center;
 }
 
-.back-link {
-    position: absolute;
-    left: 0;
-    top: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #000;
-    text-decoration: none;
-    padding: 8px 12px;
-    border: 2px solid #000;
-    background-color: #fff;
-}
-
-.back-link:active {
-    background-color: #e0e0e0;
-}
-
 .header-tabs {
     display: flex;
     gap: 5px;
@@ -269,8 +252,7 @@ body.dark-theme .dashboard-card,
 body.dark-theme .entity-card,
 body.dark-theme .header-btn,
 body.dark-theme .toggle-btn,
-body.dark-theme .refresh-btn,
-body.dark-theme .back-link {
+body.dark-theme .refresh-btn {
     background-color: #2a2a2a;
     color: #ffffff;
     border-color: #ffffff;
@@ -280,8 +262,7 @@ body.dark-theme .dashboard-card:active,
 body.dark-theme .entity-card:active,
 body.dark-theme .header-btn:active,
 body.dark-theme .toggle-btn:active,
-body.dark-theme .refresh-btn:active,
-body.dark-theme .back-link:active {
+body.dark-theme .refresh-btn:active {
     background-color: #3a3a3a;
 }
 

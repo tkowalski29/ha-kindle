@@ -14,13 +14,13 @@
     <div class="card-button entity-card button {% if is_active %}active{% endif %}"
          data-grid-columns="{{ card.grid_options.columns if card.grid_options else 'default' }}"
          style="cursor: pointer;">
-        <div class="entity-icon" style="font-weight: bold; font-family: monospace;">{{ icon }}</div>
-        <div class="entity-info">
-            <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
+        <div style="margin-bottom: 4px; overflow: hidden;">
+            <span class="entity-icon" style="font-weight: bold; font-family: monospace; float: left;">{{ icon }}</span>
             {% if card.show_state != false %}
-            <div class="entity-state">{{ card.state }}</div>
+            <span class="entity-state" style="float: right;">{{ card.state }}</span>
             {% endif %}
         </div>
+        <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
     </div>
 {% if card.entity %}
 </a>

@@ -21,13 +21,7 @@
 <body class="{% if theme == 'dark' %}dark-theme{% endif %}">
     <div class="container">
         <header>
-            {% if show_back_button %}
-            <a href="/" class="back-link">← Powrót</a>
-            {% endif %}
             <h1>{{ dashboard_title }}</h1>
-            {% if show_last_update %}
-            <div class="last-update">Aktualizacja: {{ last_update }}</div>
-            {% endif %}
         </header>
 
         {% if view_structure %}

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import json
+import time
 from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, request
 import requests
@@ -22,10 +23,8 @@ HA_TOKEN = os.getenv("HA_TOKEN")
 
 # UI Configuration
 AUTO_REFRESH_INTERVAL = int(os.getenv("AUTO_REFRESH_INTERVAL", "0"))
+TOGGLE_WAIT_TIME = float(os.getenv("TOGGLE_WAIT_TIME", "1.5"))
 THEME = os.getenv("THEME", "light")
-GRID_COLUMNS = os.getenv("GRID_COLUMNS", "auto")
-SHOW_BACK_BUTTON = os.getenv("SHOW_BACK_BUTTON", "true").lower() == "true"
-SHOW_LAST_UPDATE = os.getenv("SHOW_LAST_UPDATE", "true").lower() == "true"
 
 # Validate required environment variables
 if not all([HA_URL, HA_WS_URL, HA_TOKEN]):
@@ -452,11 +451,19 @@ def enrich_card_with_state(card, states_dict):
     if state_data:
         card["state"] = state_data.get("state")
         card["attributes"] = state_data.get("attributes", {})
-        card["friendly_name"] = state_data["attributes"].get("friendly_name", entity_id)
+        # Only set friendly_name if card doesn't already have a name configured
+        if not card.get("name"):
+            card["friendly_name"] = state_data["attributes"].get("friendly_name", entity_id)
+        else:
+            card["friendly_name"] = card.get("name")
     else:
         card["state"] = "unavailable"
         card["attributes"] = {}
-        card["friendly_name"] = entity_id
+        # Only set friendly_name if card doesn't already have a name configured
+        if not card.get("name"):
+            card["friendly_name"] = entity_id
+        else:
+            card["friendly_name"] = card.get("name")
 
     return card
 
@@ -531,12 +538,8 @@ def dashboard(dashboard_path):
         view_structure=view_structure,
         dashboard_title=dashboard_title,
         dashboard_path=dashboard_path,
-        last_update=datetime.now().strftime("%H:%M:%S"),
         auto_refresh=AUTO_REFRESH_INTERVAL,
         theme=THEME,
-        grid_columns=GRID_COLUMNS,
-        show_back_button=SHOW_BACK_BUTTON,
-        show_last_update=SHOW_LAST_UPDATE,
     )
 
 
@@ -546,6 +549,8 @@ def toggle(dashboard_path, entity_id):
 
     try:
         call_service(domain, "toggle", entity_id)
+        # Wait for Home Assistant to update the state
+        time.sleep(TOGGLE_WAIT_TIME)
     except Exception as e:
         print(f"Error toggling {entity_id}: {e}")
 

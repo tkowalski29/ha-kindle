@@ -16,11 +16,11 @@
     <div class="card-tile entity-card {{ domain }} {% if card.state in ['on', 'unlocked', 'open', 'cleaning', 'docked'] %}active{% endif %}"
          data-grid-columns="{{ card.grid_options.columns if card.grid_options else 'default' }}"
          style="cursor: {% if card.entity and domain in ['light', 'switch', 'fan'] %}pointer{% else %}default{% endif %};">
-        <div class="entity-icon" style="font-weight: bold; font-family: monospace;">{{ icon }}</div>
-        <div class="entity-info">
-            <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
-            <div class="entity-state">{{ card.state }}</div>
+        <div style="margin-bottom: 4px; overflow: hidden;">
+            <span class="entity-icon" style="font-weight: bold; font-family: monospace; float: left;">{{ icon }}</span>
+            <span class="entity-state" style="float: right;">{{ card.state }}</span>
         </div>
+        <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
     </div>
 {% if card.entity and domain in ['light', 'switch', 'fan'] %}
 </a>

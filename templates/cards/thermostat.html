@@ -5,10 +5,9 @@
     <div class="card-thermostat entity-card climate {% if card.state not in ['off', 'unavailable'] %}active{% endif %}"
          data-grid-columns="{{ card.grid_options.columns if card.grid_options else 'default' }}"
          style="cursor: pointer;">
-        <div class="entity-icon" style="font-weight: bold;">[T]</div>
-        <div class="entity-info">
-            <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
-            <div class="entity-state">
+        <div style="margin-bottom: 4px; overflow: hidden;">
+            <span class="entity-icon" style="font-weight: bold; font-family: monospace; float: left;">[T]</span>
+            <span class="entity-state" style="float: right;">
                 {% if card.state == 'unavailable' %}
                     UNAVAILABLE
                 {% elif card.attributes.current_temperature %}
@@ -19,8 +18,9 @@
                 {% else %}
                     {{ card.state }}
                 {% endif %}
-            </div>
+            </span>
         </div>
+        <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
     </div>
 {% if card.entity %}
 </a>
