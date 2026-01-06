@@ -3,35 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="10">
+    {% if auto_refresh > 0 %}
+    <meta http-equiv="refresh" content="{{ auto_refresh }}">
+    {% endif %}
     <title>Home Assistant - Kindle</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .dashboard {
+            {% if grid_columns != 'auto' %}
+            grid-template-columns: repeat({{ grid_columns }}, 1fr) !important;
+            {% endif %}
+        }
+
+        /* Removed - using inline float styles for better Kindle compatibility */
+    </style>
 </head>
-<body>
+<body class="{% if theme == 'dark' %}dark-theme{% endif %}">
     <div class="container">
         <header>
+            {% if show_back_button %}
             <a href="/" class="back-link">← Powrót</a>
+            {% endif %}
             <h1>{{ dashboard_title }}</h1>
+            <div id="screen-info" style="font-size: 14px; color: #666; margin-top: 5px;"></div>
+            {% if show_last_update %}
             <div class="last-update">Aktualizacja: {{ last_update }}</div>
+            {% endif %}
         </header>
+        <script>
+            // Display screen resolution
+            var screenInfo = document.getElementById('screen-info');
+            if (screenInfo) {
+                var width = window.innerWidth || document.documentElement.clientWidth;
+                var height = window.innerHeight || document.documentElement.clientHeight;
+                var screenWidth = screen.width || 'N/A';
+                var screenHeight = screen.height || 'N/A';
+                screenInfo.innerHTML = 'Viewport: ' + width + 'x' + height + ' | Screen: ' + screenWidth + 'x' + screenHeight;
+            }
+        </script>
 
-        <div class="dashboard">
-            {% for entity in entities %}
-                {% if entity.type == 'light' %}
-                    {% include 'entity/entity_light.html' %}
-                {% elif entity.type == 'switch' %}
-                    {% include 'entity/entity_switch.html' %}
-                {% elif entity.type == 'fan' %}
-                    {% include 'entity/entity_fan.html' %}
-                {% elif entity.type == 'cover' %}
-                    {% include 'entity/entity_cover.html' %}
-                {% elif entity.type == 'climate' %}
-                    {% include 'entity/entity_climate.html' %}
-                {% elif entity.type == 'sensor' %}
-                    {% include 'entity/entity_sensor.html' %}
+        {% if view_structure %}
+            {# Render Lovelace view structure #}
+            <div style="width: 100%; overflow: hidden;">
+                {% if view_structure.type == 'sections' %}
+                    {# Sections layout - using float for Kindle compatibility #}
+                    {% for section in view_structure.sections %}
+                    <div class="lovelace-section" style="width: 48%; float: left; margin-right: 2%; padding: 5px; border: 1px solid #ccc;">
+                        {% for card in section.cards %}
+                            {% if card.type == 'heading' %}
+                                {% include 'cards/heading.html' %}
+                            {% elif card.type == 'thermostat' %}
+                                {% include 'cards/thermostat.html' %}
+                            {% elif card.type == 'tile' %}
+                                {% include 'cards/tile.html' %}
+                            {% elif card.type == 'button' %}
+                                {% include 'cards/button.html' %}
+                            {% else %}
+                                {# Fallback for unknown card types #}
+                                {% include 'cards/tile.html' %}
+                            {% endif %}
+                        {% endfor %}
+                        <div style="clear: both;"></div>
+                    </div>
+                    {% endfor %}
+                    <div style="clear: both;"></div>
+                {% else %}
+                    {# Cards layout #}
+                    <div class="lovelace-cards">
+                        {% for card in view_structure.cards %}
+                            {% if card.type == 'heading' %}
+                                {% include 'cards/heading.html' %}
+                            {% elif card.type == 'thermostat' %}
+                                {% include 'cards/thermostat.html' %}
+                            {% elif card.type == 'tile' %}
+                                {% include 'cards/tile.html' %}
+                            {% elif card.type == 'button' %}
+                                {% include 'cards/button.html' %}
+                            {% else %}
+                                {# Fallback for unknown card types #}
+                                {% include 'cards/tile.html' %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 {% endif %}
-            {% endfor %}
-        </div>
+            </div>
+        {% else %}
+            {# Legacy entity rendering for non-Lovelace dashboards #}
+            <div class="dashboard">
+                {% for entity in entities %}
+                    {% if entity.type == 'light' %}
+                        {% include 'entity/entity_light.html' %}
+                    {% elif entity.type == 'switch' %}
+                        {% include 'entity/entity_switch.html' %}
+                    {% elif entity.type == 'fan' %}
+                        {% include 'entity/entity_fan.html' %}
+                    {% elif entity.type == 'cover' %}
+                        {% include 'entity/entity_cover.html' %}
+                    {% elif entity.type == 'climate' %}
+                        {% include 'entity/entity_climate.html' %}
+                    {% elif entity.type == 'sensor' %}
+                        {% include 'entity/entity_sensor.html' %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>

@@ -1,0 +1,18 @@
+{# Button card for actions #}
+{% set domain = card.entity.split('.')[0] if card.entity else 'unknown' %}
+{% set icon = card.icon or '🔘' %}
+{% set is_active = card.state in ['on', 'active', 'true'] %}
+
+<div class="card-button entity-card button {% if is_active %}active{% endif %}"
+     data-grid-columns="{{ card.grid_options.columns if card.grid_options else 'default' }}">
+    <div class="entity-icon">{{ icon }}</div>
+    <div class="entity-info">
+        <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
+        {% if card.show_state != false %}
+        <div class="entity-state">{{ card.state }}</div>
+        {% endif %}
+    </div>
+    {% if card.entity %}
+    <a href="/toggle/{{ dashboard_path }}/{{ card.entity }}" class="toggle-btn">{{ card.name or 'WŁĄCZ' }}</a>
+    {% endif %}
+</div>

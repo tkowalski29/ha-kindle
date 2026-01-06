@@ -1,2 +1,7 @@
 .claude/*
 claude.sh
+.playwright-mcp/*
+
+# Environment variables
+.env
+.env.local

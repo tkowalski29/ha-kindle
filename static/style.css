@@ -101,12 +101,12 @@ header {
 
 .entity-card {
     border: 2px solid #000;
-    padding: 15px;
+    padding: 10px;
     background-color: #fff;
     display: flex;
     align-items: center;
-    gap: 15px;
-    min-height: 80px;
+    gap: 10px;
+    min-height: 60px;
     transition: none;
 }
 
@@ -293,4 +293,58 @@ body.dark-theme header,
 body.dark-theme .footer {
     border-color: #ffffff;
     background-color: #1a1a1a;
+}
+
+/* Lovelace view styles - sections side-by-side */
+.lovelace-view {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.lovelace-section {
+    overflow: hidden;
+}
+
+/* Grid options for cards - using float for Kindle compatibility */
+[data-grid-columns="full"],
+[data-grid-columns="12"] {
+    width: 100% !important;
+    float: none !important;
+    clear: both !important;
+    margin-bottom: 8px !important;
+}
+
+[data-grid-columns="default"] {
+    width: 48% !important;
+    float: left !important;
+    margin-right: 2% !important;
+    margin-bottom: 8px !important;
+}
+
+/* Card types */
+.card-heading {
+    grid-column: 1 / -1;
+    padding: 8px 0;
+    border-bottom: 2px solid #000;
+    margin-bottom: 5px;
+}
+
+.card-heading h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.card-thermostat,
+.card-tile,
+.card-button {
+    /* Inherit from entity-card */
+}
+
+/* Dark theme for Lovelace */
+body.dark-theme .card-heading {
+    border-color: #ffffff;
+    color: #ffffff;
 }

@@ -1,0 +1,23 @@
+{# Thermostat card for climate entities #}
+<div class="card-thermostat entity-card climate {% if card.state not in ['off', 'unavailable'] %}active{% endif %}"
+     data-grid-columns="{{ card.grid_options.columns if card.grid_options else 'default' }}">
+    <div class="entity-icon">🌡️</div>
+    <div class="entity-info">
+        <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
+        <div class="entity-state">
+            {% if card.state == 'unavailable' %}
+                UNAVAILABLE
+            {% elif card.attributes.current_temperature %}
+                {{ card.attributes.current_temperature }}°C
+                {% if card.attributes.temperature %}
+                → {{ card.attributes.temperature }}°C
+                {% endif %}
+            {% else %}
+                {{ card.state }}
+            {% endif %}
+        </div>
+    </div>
+    {% if card.entity %}
+    <a href="/toggle/{{ dashboard_path }}/{{ card.entity }}" class="toggle-btn">{{ 'WYŁ' if card.state not in ['off', 'unavailable'] else 'WŁ' }}</a>
+    {% endif %}
+</div>

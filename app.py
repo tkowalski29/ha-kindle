@@ -8,13 +8,28 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import websocket
 import threading
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# Configuration
-HA_URL = "http://192.168.18.66:8123"
-HA_WS_URL = "ws://192.168.18.66:8123/api/websocket"
-HA_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyYzFhOWIyYzMwODY0MWRmYTczNDYyYjYyYTI5N2E1NiIsImlhdCI6MTc2NzYyNTM5MSwiZXhwIjoyMDgyOTg1MzkxfQ.ETP476Fc_eoVKqoSbQOzBLRoD_QTCzcFRbEOLBmbbO8"
+# Configuration from environment variables
+HA_URL = os.getenv("HA_URL")
+HA_WS_URL = os.getenv("HA_WS_URL")
+HA_TOKEN = os.getenv("HA_TOKEN")
+
+# UI Configuration
+AUTO_REFRESH_INTERVAL = int(os.getenv("AUTO_REFRESH_INTERVAL", "0"))
+THEME = os.getenv("THEME", "light")
+GRID_COLUMNS = os.getenv("GRID_COLUMNS", "auto")
+SHOW_BACK_BUTTON = os.getenv("SHOW_BACK_BUTTON", "true").lower() == "true"
+SHOW_LAST_UPDATE = os.getenv("SHOW_LAST_UPDATE", "true").lower() == "true"
+
+# Validate required environment variables
+if not all([HA_URL, HA_WS_URL, HA_TOKEN]):
+    raise ValueError("Missing required environment variables. Please check your .env file.")
 
 # Create session with retry logic
 session = requests.Session()
@@ -314,6 +329,8 @@ def home():
         "home.html",
         dashboards=dashboards,
         current_view=view,
+        auto_refresh=AUTO_REFRESH_INTERVAL,
+        theme=THEME,
     )
 
 
@@ -382,19 +399,89 @@ def extract_entities_from_card(card, entity_ids):
                 entity_ids.append(entity["entity"])
 
 
+def get_lovelace_view_structure(dashboard_id, view_path):
+    """Get full Lovelace view structure with sections and cards"""
+    # Try different url_path formats
+    url_paths = [
+        dashboard_id.replace("_", "-"),
+        dashboard_id.replace("dashboard_", ""),
+        dashboard_id,
+    ]
+
+    config = None
+    for url_path in url_paths:
+        config = get_lovelace_config(url_path)
+        if config:
+            break
+
+    if not config:
+        return None
+
+    # Find the specific view
+    views = config.get("views", [])
+    target_view = None
+
+    for view in views:
+        v_path = view.get("path", "")
+        v_title = view.get("title", "")
+        if v_path == view_path or v_title == view_path:
+            target_view = view
+            break
+
+    if not target_view:
+        return None
+
+    # Return full view structure
+    return {
+        "type": target_view.get("type", "cards"),
+        "title": target_view.get("title", ""),
+        "max_columns": target_view.get("max_columns", 4),
+        "sections": target_view.get("sections", []),
+        "cards": target_view.get("cards", []),
+    }
+
+
+def enrich_card_with_state(card, states_dict):
+    """Add state information to a card"""
+    entity_id = card.get("entity")
+    if not entity_id:
+        return card
+
+    # Find state for this entity
+    state_data = states_dict.get(entity_id)
+    if state_data:
+        card["state"] = state_data.get("state")
+        card["attributes"] = state_data.get("attributes", {})
+        card["friendly_name"] = state_data["attributes"].get("friendly_name", entity_id)
+    else:
+        card["state"] = "unavailable"
+        card["attributes"] = {}
+        card["friendly_name"] = entity_id
+
+    return card
+
+
 @app.route("/dashboard/<path:dashboard_path>")
 def dashboard(dashboard_path):
     # Get all states
     states = get_states()
+    states_dict = {s["entity_id"]: s for s in states}
 
-    # Determine which entities to show
+    # Variables for rendering
+    dashboard_title = ""
+    view_structure = None
+    entities = []
+
+    # Determine which type of dashboard to show
     if dashboard_path == "all":
         dashboard_title = "Wszystkie urządzenia"
         entity_ids = None
+        entities = filter_entities(states, entity_ids)
     elif dashboard_path.startswith("area-"):
         area_id = dashboard_path[5:]  # Remove "area-" prefix
         dashboard_title = area_id
         entity_ids = get_entities_by_area(area_id)
+        entities = filter_entities(states, entity_ids)
     elif dashboard_path.startswith("lovelace-"):
         # Parse lovelace path: "lovelace-dashboard_oscar-ada"
         lovelace_part = dashboard_path[9:]  # Remove "lovelace-" prefix
@@ -420,21 +507,36 @@ def dashboard(dashboard_path):
             view_path = parts[1] if len(parts) > 1 else ""
 
         dashboard_title = view_path if view_path else dashboard_id
-        entity_ids = get_entities_from_lovelace_view(dashboard_id, view_path)
+
+        # Get full view structure
+        view_structure = get_lovelace_view_structure(dashboard_id, view_path)
+
+        if view_structure:
+            # Enrich cards with state information
+            for section in view_structure.get("sections", []):
+                for card in section.get("cards", []):
+                    enrich_card_with_state(card, states_dict)
+
+            # Also enrich cards in view (for non-sections layout)
+            for card in view_structure.get("cards", []):
+                enrich_card_with_state(card, states_dict)
     else:
         # Unknown dashboard type
         dashboard_title = dashboard_path
-        entity_ids = None
-
-    # Filter entities
-    entities = filter_entities(states, entity_ids)
+        entities = []
 
     return render_template(
         "dashboard.html",
         entities=entities,
+        view_structure=view_structure,
         dashboard_title=dashboard_title,
         dashboard_path=dashboard_path,
         last_update=datetime.now().strftime("%H:%M:%S"),
+        auto_refresh=AUTO_REFRESH_INTERVAL,
+        theme=THEME,
+        grid_columns=GRID_COLUMNS,
+        show_back_button=SHOW_BACK_BUTTON,
+        show_last_update=SHOW_LAST_UPDATE,
     )
 
 
@@ -451,4 +553,8 @@ def toggle(dashboard_path, entity_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10010, debug=True)
+    app.run(
+        host=os.getenv("FLASK_HOST", "0.0.0.0"),
+        port=int(os.getenv("FLASK_PORT", 10010)),
+        debug=os.getenv("FLASK_DEBUG", "True").lower() == "true"
+    )

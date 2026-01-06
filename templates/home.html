@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Assistant - Dashboardy</title>
+    {% if auto_refresh > 0 %}
+    <meta http-equiv="refresh" content="{{ auto_refresh }}">
+    {% endif %}
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
+<body class="{% if theme == 'dark' %}dark-theme{% endif %}">
     <div class="container">
         <header>
             <div class="header-tabs">
