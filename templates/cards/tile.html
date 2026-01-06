@@ -1,23 +1,27 @@
 {# Tile card for generic entities #}
 {% set domain = card.entity.split('.')[0] if card.entity else 'unknown' %}
 {% set icon_map = {
-    'light': {'on': '💡', 'off': '⚫'},
-    'switch': {'on': '🔘', 'off': '⚪'},
-    'fan': {'on': '🌀', 'off': '⭕'},
-    'vacuum': {'on': '🧹', 'off': '🧹'},
-    'lock': {'locked': '🔒', 'unlocked': '🔓'},
-    'cover': {'open': '📂', 'closed': '📁'}
+    'light': {'on': '[●]', 'off': '[○]'},
+    'switch': {'on': '[■]', 'off': '[□]'},
+    'fan': {'on': '[~]', 'off': '[~]'},
+    'vacuum': {'on': '[V]', 'off': '[V]'},
+    'lock': {'locked': '[=]', 'unlocked': '[-]'},
+    'cover': {'open': '[^]', 'closed': '[v]'}
 } %}
-{% set icon = icon_map.get(domain, {}).get(card.state, '❓') %}
+{% set icon = icon_map.get(domain, {}).get(card.state, '[?]') %}
 
-<div class="card-tile entity-card {{ domain }} {% if card.state in ['on', 'unlocked', 'open', 'cleaning', 'docked'] %}active{% endif %}"
-     data-grid-columns="{{ card.grid_options.columns if card.grid_options else 'default' }}">
-    <div class="entity-icon">{{ icon }}</div>
-    <div class="entity-info">
-        <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
-        <div class="entity-state">{{ card.state }}</div>
+{% if card.entity and domain in ['light', 'switch', 'fan'] %}
+<a href="/toggle/{{ dashboard_path }}/{{ card.entity }}" style="text-decoration: none; color: inherit; display: block;">
+{% endif %}
+    <div class="card-tile entity-card {{ domain }} {% if card.state in ['on', 'unlocked', 'open', 'cleaning', 'docked'] %}active{% endif %}"
+         data-grid-columns="{{ card.grid_options.columns if card.grid_options else 'default' }}"
+         style="cursor: {% if card.entity and domain in ['light', 'switch', 'fan'] %}pointer{% else %}default{% endif %};">
+        <div class="entity-icon" style="font-weight: bold; font-family: monospace;">{{ icon }}</div>
+        <div class="entity-info">
+            <div class="entity-name">{{ card.friendly_name or card.name or card.entity }}</div>
+            <div class="entity-state">{{ card.state }}</div>
+        </div>
     </div>
-    {% if card.entity and domain in ['light', 'switch', 'fan'] %}
-    <a href="/toggle/{{ dashboard_path }}/{{ card.entity }}" class="toggle-btn">{{ 'WYŁ' if card.state == 'on' else 'WŁ' }}</a>
-    {% endif %}
-</div>
+{% if card.entity and domain in ['light', 'switch', 'fan'] %}
+</a>
+{% endif %}

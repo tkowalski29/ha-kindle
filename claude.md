@@ -44,13 +44,19 @@
 - Lokalizacja: `/static/icons/`
 - Przykład: `<img src="/static/icons/light.png" alt="Światło">`
 
-#### 2. Proste symbole ASCII
+#### 2. Proste symbole ASCII (UŻYWANE)
 ```
-[O] Światło ON     [=] Zamek zamknięty
-[X] Światło OFF    [-] Zamek otwarty
-[+] Temperatura    [~] Wentylator
-[?] Nieznany       [!] Alert
+[●] Światło ON     [=] Zamek zamknięty
+[○] Światło OFF    [-] Zamek otwarty
+[■] Switch ON      [T] Termostat
+[□] Switch OFF     [V] Odkurzacz
+[~] Wentylator     [>] Button/Action
+[^] Roleta otwarta [?] Nieznany
+[v] Roleta zamknięta
 ```
+
+Symbole są w nawiasach kwadratowych dla lepszej widoczności.
+Style: `font-weight: bold; font-family: monospace;`
 
 #### 3. Tekstowe etykiety
 ```

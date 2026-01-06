@@ -16,7 +16,19 @@
                 <a href="/?view=rooms" class="header-tab {% if current_view == 'rooms' %}active{% endif %}">Pokoje</a>
                 <a href="/?view=dashboards" class="header-tab {% if current_view == 'dashboards' %}active{% endif %}">Dashboardy</a>
             </div>
+            <div id="screen-info" style="font-size: 12px; color: #666; margin-top: 8px; text-align: center;"></div>
         </header>
+        <script>
+            // Display screen resolution
+            var screenInfo = document.getElementById('screen-info');
+            if (screenInfo) {
+                var width = window.innerWidth || document.documentElement.clientWidth;
+                var height = window.innerHeight || document.documentElement.clientHeight;
+                var screenWidth = screen.width || 'N/A';
+                var screenHeight = screen.height || 'N/A';
+                screenInfo.innerHTML = 'Viewport: ' + width + 'x' + height + ' | Screen: ' + screenWidth + 'x' + screenHeight;
+            }
+        </script>
 
         <div class="dashboard-list">
             {% for dashboard in dashboards %}

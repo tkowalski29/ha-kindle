@@ -25,22 +25,10 @@
             <a href="/" class="back-link">← Powrót</a>
             {% endif %}
             <h1>{{ dashboard_title }}</h1>
-            <div id="screen-info" style="font-size: 14px; color: #666; margin-top: 5px;"></div>
             {% if show_last_update %}
             <div class="last-update">Aktualizacja: {{ last_update }}</div>
             {% endif %}
         </header>
-        <script>
-            // Display screen resolution
-            var screenInfo = document.getElementById('screen-info');
-            if (screenInfo) {
-                var width = window.innerWidth || document.documentElement.clientWidth;
-                var height = window.innerHeight || document.documentElement.clientHeight;
-                var screenWidth = screen.width || 'N/A';
-                var screenHeight = screen.height || 'N/A';
-                screenInfo.innerHTML = 'Viewport: ' + width + 'x' + height + ' | Screen: ' + screenWidth + 'x' + screenHeight;
-            }
-        </script>
 
         {% if view_structure %}
             {# Render Lovelace view structure #}
